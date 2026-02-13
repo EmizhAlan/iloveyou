@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Для тебя ❤️</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+
+        body{
+            font-family:'Montserrat',sans-serif;
+            background:linear-gradient(135deg,#ff9aa2,#ffdde1);
+            color:#333;
+            overflow-x:hidden;
+        }
+
+        /* ===== ШАПКА ===== */
+        header{
+            position:fixed;
+            top:0;
+            width:100%;
+            background:rgba(255,255,255,.9);
+            backdrop-filter:blur(8px);
+            display:flex;
+            justify-content:center;
+            gap:40px;
+            padding:18px 10px;
+            z-index:5;
+            box-shadow:0 10px 25px rgba(0,0,0,.1);
+        }
+
+        header a{
+            text-decoration:none;
+            font-weight:600;
+            color:#e63946;
+            cursor:pointer;
+        }
+
+        section{
+            min-height:100vh;
+            padding:120px 20px 60px;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .card{
+            width:95%;
+            max-width:900px;
+            background:#fff;
+            border-radius:30px;
+            padding:50px;
+            box-shadow:0 30px 80px rgba(0,0,0,.25);
+            text-align:center;
+        }
+
+        h1{
+            font-family:'Great Vibes',cursive;
+            font-size:70px;
+            color:#e63946;
+            margin-bottom:20px;
+        }
+
+        h2{margin-bottom:18px}
+
+        p{line-height:1.7;margin-bottom:10px}
+
+        .btn{
+            padding:12px 28px;
+            border:none;
+            border-radius:30px;
+            background:#e63946;
+            color:white;
+            cursor:pointer;
+            margin:10px;
+            font-size:16px;
+            transition:transform 0.2s;
+        }
+        
+        .btn:hover{
+            transform:scale(1.05);
+            background:#ff4d5a;
+        }
+
+        /* ===== ЛОГИН ОВЕРЛЕЙ ===== */
+        #gate{
+            position:fixed;
+            inset:0;
+            background:linear-gradient(135deg,#ff9aa2,#ffdde1);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            z-index:10;
+        }
+
+        .login-box{
+            background:white;
+            padding:40px;
+            border-radius:25px;
+            text-align:center;
+            box-shadow:0 20px 60px rgba(0,0,0,.25);
+            max-width:380px;
+            width:90%;
+        }
+
+        input{
+            padding:10px;
+            border-radius:10px;
+            border:1px solid #ccc;
+            margin-top:10px;
+            font-size:16px;
+            width:100%;
+        }
+
+        .hidden{display:none}
+
+        /* игра */
+        #gameArea span{
+            position:absolute;
+            font-size:24px;
+            cursor:pointer;
+        }
+        
+        /* Стили для iframe с динозавриком */
+        .dino-container{
+            width:100%;
+            height:300px;
+            border-radius:15px;
+            overflow:hidden;
+            margin-top:20px;
+            background:#f5f5f5;
+        }
+        
+        .dino-container iframe{
+            width:100%;
+            height:100%;
+            border:none;
+        }
+        
+        .back-btn{
+            background:#666;
+            margin-top:10px;
+        }
+        
+        .back-btn:hover{
+            background:#888;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ===== ЛОГИН ===== -->
+<div id="gate">
+    <div class="login-box">
+        <!-- Шаг 1 -->
+        <div id="step1">
+            <h2>Ты любишь меня? ❤️</h2>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+                <button class="btn" style="margin: 0; min-width: 100px;" onclick="noAnswer()">Нет</button>
+                <button class="btn" style="margin: 0; min-width: 100px;" onclick="goStep2()">Да</button>
+            </div>
+        </div>
+
+        <!-- Шаг 2 -->
+        <div id="step2" class="hidden">
+            <h2>Хочешь увидеть, что будет дальше? ✨</h2>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+                <button class="btn" style="margin: 0; min-width: 100px;" onclick="noAnswer()">Нет</button>
+                <button class="btn" style="margin: 0; min-width: 100px;" onclick="goStep3()">Да</button>
+            </div>
+        </div>
+
+        <!-- Шаг 3 -->
+        <div id="step3" class="hidden">
+            <h3 style="margin-bottom:10px;color:#e63946">Последний вопрос, чтобы точно быть уверенным, что это ты ❤️</h3>
+            <p>Сколько дней мы знакомы?</p>
+            <input type="number" id="days" placeholder="Число дней" />
+            <div style="display: flex; justify-content: center;">
+                <button class="btn" onclick="checkDays()">Войти</button>
+            </div>
+        </div>
+
+        <!-- сообщение + картинка + кнопка попробовать снова -->
+        <div id="errorContainer" style="display: none;">
+            <p id="msg" style="color:#d00000; margin-top:10px"></p>
+            <img id="funImg" src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif" style="width:160px; margin-top:10px; border-radius:15px; display: none;" />
+            <button id="retry" class="btn" onclick="retry()" style="margin-top: 15px; background: #666;">Попробовать снова</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ШАПКА ===== -->
+<header>
+    <a onclick="scrollToId('home')">Главная</a>
+    <a onclick="scrollToId('story')">Наша история</a>
+    <a onclick="scrollToId('game')">Игра</a>
+    <a onclick="scrollToId('card')">Открытка</a>
+</header>
+
+
+<!-- ===== ГЛАВНАЯ ===== -->
+<section id="home">
+    <div class="card">
+        <h1>С Днём святого Валентина ❤️</h1>
+
+        <p style="font-size:20px;font-weight:600;">
+            Моя любимая, это страница создана только для тебя.
+        </p>
+
+        <p>
+            Сегодня 14 февраля — день любви, тепла и самых искренних чувств.
+            И в этот день я хочу напомнить тебе, как много ты для меня значишь.
+        </p>
+
+        <p>
+            Я сделал этот маленький сайт как сюрприз: здесь наши воспоминания,
+            улыбки, моменты счастья и всё то, что связано с нами. Это не просто страница —
+            это частичка моего сердца.
+        </p>
+
+        <p>
+            Пройти сюда может только один человек. Ведь только ты знаешь ответы на наши
+            секретные вопросы. Значит, это место по‑настоящему твоё ❤️
+        </p>
+
+        <p style="margin-top:18px;font-weight:600;color:#e63946;">
+            Спасибо тебе за каждый день рядом. Я бесконечно люблю тебя и хочу провести
+            с тобой ещё тысячи таких же счастливых дней.
+        </p>
+    </div>
+</section>
+
+
+<!-- ===== ИСТОРИЯ ===== -->
+<section id="story">
+    <div class="card" style="text-align: left;">
+        <h2 style="font-family: 'Great Vibes', cursive; font-size: 52px; color: #e63946; text-align: center; margin-bottom: 25px;">Наша история</h2>
+        
+        <div style="font-size: 17px; line-height: 1.8; color: #2d2d2d;">
+            <p style="margin-bottom: 20px;">Наша история началась с военного времени для меня, ничего не предвещало беды как ты упала на меня словно ракета «Нептун». С этого самого момента я понял насколько насыщенной и живой станет моя жизнь и насколько прекрасной окажешься ты, я был так счастлив, что встретил тебя и счастлив что ты дождалась меня, что мне не описать одним сообщением насколько ты ценна для меня.</p>
+            
+            <p style="margin-bottom: 20px;">Спустя некоторое время мы с тобой наконец-то смогли увидеться и мне было настолько неловко, что я был готов провалиться сквозь землю и мне правда было трудно даже заговорить с тобой.</p>
+            
+            <p style="margin-bottom: 20px;">Проходит пол года ты уже навещаешь меня в новом месте, так как меня перевели на боевую позицию, но я не отчаиваюсь и наивно мечтаю что когда-нибудь я смогу со своей любимой побывать за границей, как обновлю свой компьютер и как смогу обновить свой давно лагающий телефон. И думая о себе я часто вспоминаю самое главное — я живу ради тебя и только ради тебя. Мы вместе учимся, вместе растём, вместе побеждаем и я рад что мне повезло достигать чего-то большего именно с тобой моя дорогая.</p>
+            
+            <p style="margin-bottom: 20px;">Вот и проходит ещё пол года, я наконец-то возвращаюсь домой, и тут начинается наша любовная история, я очень ценю этот момент жизни так как ты мне по-настоящему показала и доказала, что я могу быть любим и что я могу быть ценен для кого-то, а оказалось — для самого прекрасного человека в моей жизни.</p>
+            
+            <p style="margin-bottom: 20px;">Я как и хотел обновил свой пк, отдыхаю с братьями, устраиваюсь на работу и наконец приезжаю к тебе. Мы с тобой побывали на концерте.</p>
+            
+            <p style="margin-bottom: 20px;">И начинается самое трудное начало в моей жизни, я лечусь, восстанавливаюсь, делаю свои документы, после чего мы наконец попадаем на футбольный матч, на который я всегда мечтал попасть. Через время мне удалось получить загранпаспорт, мы побывали за границей, встретили свой первый новый год. Этот новый год для меня особенно важен, так как мне кажется это был наш переломный период — конец 3 этапа и мы перешли на новый этап «семья», так как ты стала для меня настолько близка и родственна, что я считаю тебя своей семьёй, я привязан к тебе до своей смерти и не раньше.</p>
+            
+            <p style="margin-bottom: 20px;">Я исполняю вторую свою главную мечту — это покупка телефона, первая это встреча с тобой конечно же.</p>
+            
+            <p style="margin-bottom: 20px;">В общем дорогая, пусть я и не рядом, но пусть то тепло которое я могу передать через километры греет тебя в самые холодные дни.</p>
+            
+            <div style="background: #fff0ed; border-radius: 20px; padding: 20px; margin-top: 25px; border-left: 4px solid #e63946;">
+                <p style="font-weight: 600; color: #e63946; margin-bottom: 10px;">Я хочу тебя добиваться и я буду тебя добиваться</p>
+                <p style="margin-bottom: 0;">Выйду на любой ринг, чтобы доказать как люблю тебя, мне не жалко своей жизни и я готов посвятить её только тебе, так как без тебя моя жизнь не имеет смысла.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ===== ИГРА ===== -->
+<section id="game">
+    <div class="card">
+        <h2>Мини‑игры для тебя 🎮</h2>
+        <p style="margin-bottom:15px">Выбери игру, которая тебе больше нравится</p>
+
+        <button class="btn" onclick="startHearts()">❤️ Сердечки</button>
+        <button class="btn" onclick="startDino()">🦖 Динозаврик</button>
+        
+        <!-- Кнопка возврата к выбору игр (изначально скрыта) -->
+        <button class="btn back-btn hidden" id="backToGamesBtn" onclick="backToGames()">← К выбору игр</button>
+
+        <p id="gameMessage" style="margin-top:15px;font-weight:600;color:#e63946"></p>
+        
+        <!-- Счет для игры в сердечки (скрыт по умолчанию) -->
+        <div id="scoreContainer" class="hidden">
+            <p style="margin-top:10px">Счёт: <span id="score">0</span></p>
+        </div>
+        
+        <!-- Контейнер для игры в сердечки -->
+        <div id="gameArea" style="position:relative;height:320px;overflow:hidden;margin-top:10px"></div>
+        
+        <!-- Контейнер для игры в динозаврика (скрыт по умолчанию) -->
+        <div id="dinoContainer" class="dino-container hidden"></div>
+    </div>
+</section>
+
+<!-- ===== ОТКРЫТКА ===== -->
+<!-- ===== ГАЛЕРЕЯ ===== -->
+<section id="gallery">
+    <div class="card" style="padding: 30px 25px;">
+        <h2 style="font-family: 'Great Vibes', cursive; font-size: 48px; color: #e63946; margin-bottom: 25px; text-align: center;">Наши моменты ❤️</h2>
+        
+       <div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="2.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="3.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="4.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="5.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="6.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="7.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="8.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="9.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="0.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="11.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="12.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="13.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="14.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+<div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Фото 1: Знакомство -->
+    <div style="background: #fff0ed; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);">
+        <div style="aspect-ratio: 4/3; background: #ffe4e0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 25px 25px 0 0;">
+            <img src="15.jpg" alt="День знакомства" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        
+    </div>
+</div>
+<br>
+
+    
+
+
+ 
+        
+        <p style="text-align: center; margin-top: 25px; color: #666; font-style: italic;">Каждая фотография хранит частичку нашего счастья ❤️</p>
+    </div>
+</section>
+
+
+<script>
+
+/* ===== ЛОГИН ЛОГИКА ===== */
+const errorContainer = document.getElementById('errorContainer');
+const msg = document.getElementById('msg');
+const funImg = document.getElementById('funImg');
+const retryBtn = document.getElementById('retry');
+
+function noAnswer() {
+    // Скрываем все шаги
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step3').style.display = 'none';
+    
+    // Показываем контейнер с ошибкой
+    errorContainer.style.display = 'block';
+    msg.innerText = 'Попробуй ещё раз 😅';
+    funImg.style.display = '';
+}
+
+function retry() {
+    // Скрываем контейнер с ошибкой
+    errorContainer.style.display = 'none';
+    
+    // Показываем первый шаг
+    const step1 = document.getElementById('step1');
+    step1.style.display = 'block';
+    step1.classList.remove('hidden');
+    
+    // Очищаем сообщения
+    msg.innerText = '';
+    funImg.style.display = 'none';
+}
+
+function goStep2() {
+    // Скрываем шаг 1
+    document.getElementById('step1').style.display = 'none';
+    
+    // Показываем шаг 2
+    const step2 = document.getElementById('step2');
+    step2.style.display = 'block';
+    step2.classList.remove('hidden');
+    
+    // Скрываем контейнер с ошибкой если он был виден
+    errorContainer.style.display = 'none';
+}
+
+function goStep3() {
+    // Скрываем шаг 2
+    document.getElementById('step2').style.display = 'none';
+    
+    // Показываем шаг 3
+    const step3 = document.getElementById('step3');
+    step3.style.display = 'block';  // Этой строки не хватало!
+    step3.classList.remove('hidden');
+    
+    // Скрываем контейнер с ошибкой если он был виден
+    errorContainer.style.display = 'none';
+}
+
+function checkDays() {
+    const value = document.getElementById('days').value;
+    if(value == 526) {
+        document.getElementById('gate').style.display = 'none';
+    } else {
+        // Скрываем шаг 3
+        document.getElementById('step3').style.display = 'none';
+        
+        // Показываем контейнер с ошибкой
+        errorContainer.style.display = 'block';
+        msg.innerText = 'Хмм… кажется число другое ❤️';
+        funImg.style.display = 'block';
+    }
+}
+
+/* ===== НАВИГАЦИЯ ===== */
+function scrollToId(id){
+    document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
+
+/* ===== ИГРЫ ===== */
+let score=0, interval;
+const area=document.getElementById('gameArea');
+const gameMsg=document.getElementById('gameMessage');
+const scoreContainer = document.getElementById('scoreContainer');
+const dinoContainer = document.getElementById('dinoContainer');
+const backBtn = document.getElementById('backToGamesBtn');
+
+function clearGame(){
+    clearInterval(interval);
+    area.innerHTML='';
+    area.classList.remove('hidden');
+    dinoContainer.classList.add('hidden');
+    dinoContainer.innerHTML = '';
+    score=0;
+    document.getElementById('score').innerText=0;
+}
+
+function backToGames() {
+    // Показываем кнопки выбора игр
+    clearGame();
+    gameMsg.innerText = '';
+    scoreContainer.classList.add('hidden');
+    backBtn.classList.add('hidden');
+    area.classList.add('hidden');
+}
+
+/* --- Сердечки --- */
+function startHearts(){
+    clearGame();
+    gameMsg.innerText='Лови как можно больше сердечек 💕';
+    scoreContainer.classList.remove('hidden');
+    backBtn.classList.remove('hidden');
+    area.classList.remove('hidden');
+    
+    interval=setInterval(()=>{
+        const heart=document.createElement('span');
+        heart.innerText='❤️';
+        heart.style.position='absolute';
+        heart.style.left=Math.random()*90+'%';
+        heart.style.top='0';
+        heart.style.fontSize='24px';
+        heart.style.cursor='pointer';
+        heart.style.animation='fall 2s linear';
+
+        heart.onclick=()=>{
+            score++;
+            document.getElementById('score').innerText=score;
+            heart.remove();
+        };
+
+        area.appendChild(heart);
+        setTimeout(()=>{
+            if(heart.parentNode) heart.remove();
+        },2000);
+    },500);
+}
+
+/* --- Динозаврик от Google --- */
+function startDino(){
+    clearGame();
+    gameMsg.innerText='Я знаю как ты любишь динозавров — игра специально для тебя 🦖';
+    backBtn.classList.remove('hidden');
+    area.classList.add('hidden');
+    scoreContainer.classList.add('hidden');
+    dinoContainer.classList.remove('hidden');
+    
+    // Создаем iframe с игрой Google Dino
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://chromedino.com/';
+    iframe.title = 'Google Dino Game';
+    iframe.setAttribute('allowfullscreen', 'true');
+    
+    dinoContainer.innerHTML = ''; // Очищаем контейнер
+    dinoContainer.appendChild(iframe);
+}
+
+// Добавляем CSS анимацию для падающих сердечек
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fall {
+        0% { top: -10%; }
+        100% { top: 110%; }
+    }
+`;
+document.head.appendChild(style);
+
+</script>
+
+</body>
+</html>
